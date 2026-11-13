@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     container:
-      image: psl1ght/psl1ght:latest
+      image: zeldin/ps3dev-docker:latest
       options: --user root
 
     steps:
