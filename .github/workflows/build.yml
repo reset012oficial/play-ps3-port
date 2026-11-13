@@ -31,10 +31,25 @@ jobs:
         run: |
           ln -sf ${{ github.workspace }}/play-emu /opt/play-emu
 
+      - name: Find Python packaging tools (sfo.py, pkg.py)
+        run: |
+          # Procura sfo.py e pkg.py no container
+          find / -name "sfo.py" -type f 2>/dev/null || true
+          find / -name "pkg.py" -type f 2>/dev/null || true
+
+          # Se não achou, instala via pip (são do ps3tools)
+          if ! command -v sfo.py &> /dev/null; then
+            pip3 install ps3tools 2>/dev/null || pip3 install --break-system-packages ps3tools 2>/dev/null || true
+          fi
+
+          # Verifica novamente
+          which sfo.py || find / -name "sfo.py" -type f 2>/dev/null
+          which pkg.py || find / -name "pkg.py" -type f 2>/dev/null
+
       - name: Verify PSL1GHT installation
         run: |
-          echo "PSL1GHT path: $PSL1GHT"
-          ls -la $PSL1GHT
+          echo "PSL1GHT path: /usr/local/ps3dev"
+          ls -la /usr/local/ps3dev
           which ppu-g++
           which make_self_npdrm
           which sfo.py
@@ -43,10 +58,11 @@ jobs:
       - name: Build project
         run: |
           export EXTRA_INCLUDES="-I/opt/play-emu/src -I/opt/play-emu/src/ui_ps3"
+          export PATH="/usr/local/ps3dev/bin:$PATH"
           make clean
           make pkg
         env:
-          PSL1GHT: /opt/psl1ght
+          PSL1GHT: /usr/local/ps3dev
 
       - name: Verify PKG output
         run: |
