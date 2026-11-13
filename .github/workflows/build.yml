@@ -31,20 +31,15 @@ jobs:
         run: |
           ln -sf ${{ github.workspace }}/play-emu /opt/play-emu
 
-      - name: Find Python packaging tools (sfo.py, pkg.py)
+      - name: Install Python packaging tools
         run: |
-          # Procura sfo.py e pkg.py no container
-          find / -name "sfo.py" -type f 2>/dev/null || true
-          find / -name "pkg.py" -type f 2>/dev/null || true
+          # Tenta instalar ps3tools (tem sfo.py, pkg.py)
+          apt-get update && apt-get install -y python3-pip 2>/dev/null || true
+          pip3 install --break-system-packages ps3tools 2>/dev/null || pip3 install ps3tools 2>/dev/null || true
 
-          # Se não achou, instala via pip (são do ps3tools)
-          if ! command -v sfo.py &> /dev/null; then
-            pip3 install ps3tools 2>/dev/null || pip3 install --break-system-packages ps3tools 2>/dev/null || true
-          fi
-
-          # Verifica novamente
-          which sfo.py || find / -name "sfo.py" -type f 2>/dev/null
-          which pkg.py || find / -name "pkg.py" -type f 2>/dev/null
+          # Verifica
+          which sfo.py || true
+          which pkg.py || true
 
       - name: Verify PSL1GHT installation
         run: |
