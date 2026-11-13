@@ -32,7 +32,7 @@ jobs:
         run: |
           # Instala dependências mínimas
           sudo apt-get update
-          sudo apt-get install -y build-essential wget xz-utils
+          sudo apt-get install -y build-essential wget xz-utils || true
 
           # Baixa toolchain pré-compilado (ps3dev releases)
           cd /tmp
