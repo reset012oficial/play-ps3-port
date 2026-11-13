@@ -66,7 +66,7 @@ jobs:
 
       - name: Build project
         run: |
-          export EXTRA_INCLUDES="-I/opt/play-emu/src -I/opt/play-emu/src/ui_ps3"
+          export EXTRA_INCLUDES="-I/opt/play-emu/src -I/opt/play-emu/src/ui_ps3 -I/usr/local/ps3dev/ppu/include"
           export PATH="/usr/local/ps3dev/bin:$PATH"
           make clean
           make pkg
