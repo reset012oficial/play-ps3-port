@@ -20,7 +20,7 @@ jobs:
       - name: Checkout Play! emulator source (for headers)
         uses: actions/checkout@v4
         with:
-          repository: play-emu/play
+          repository: jpd002/Play-
           path: play-emu
           fetch-depth: 1
 
