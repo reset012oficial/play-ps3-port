@@ -10,8 +10,11 @@ on:
 jobs:
   build:
     name: Build PS3 PKG
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 60
+    container:
+      image: hldtux/ps3dev:latest
+      options: --user root
 
     steps:
       - name: Checkout repository
@@ -24,37 +27,26 @@ jobs:
           path: play-emu
           fetch-depth: 1
 
-      - name: Copy Play! source to /opt/play-emu
+      - name: Link Play! source to /opt/play-emu
         run: |
-          mkdir -p /opt/play-emu
-          cp -r "${{ github.workspace }}/play-emu" /opt/play-emu
+          sudo ln -sf ${{ github.workspace }}/play-emu /opt/play-emu
 
-      - name: Download toolchain (PowerShell)
-        shell: pwsh
+      - name: Verify PSL1GHT installation
         run: |
-          $url = "https://github.com/ps3dev/ps3toolchain/releases/download/2023-07-22/ps3toolchain-2023-07-22-ubuntu-22.04.tar.xz"
-          $output = "C:\temp\ps3toolchain.tar.xz"
-          New-Item -ItemType Directory -Force -Path "C:\temp"
-          Invoke-WebRequest -Uri $url -OutFile $output -UseBasicParsing
-          tar -xf $output -C /opt
-
-      - name: Verify tools
-        run: |
-          export PATH="/usr/local/ps3dev/bin:/opt/ps3dev/bin:$PATH"
+          echo "PSL1GHT path: $PSL1GHT"
+          ls -la $PSL1GHT
           which ppu-g++
-          ppu-g++ --version
           which make_self_npdrm
           which sfo.py
           which pkg.py
 
       - name: Build project
         run: |
-          export PATH="/usr/local/ps3dev/bin:/opt/ps3dev/bin:$PATH"
           export EXTRA_INCLUDES="-I/opt/play-emu/src -I/opt/play-emu/src/ui_ps3"
           make clean
           make pkg
         env:
-          PSL1GHT: /usr/local/ps3dev
+          PSL1GHT: /opt/psl1ght
 
       - name: Verify PKG output
         run: |
