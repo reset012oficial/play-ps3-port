@@ -124,7 +124,8 @@ jobs:
             exit 1
           fi
 
-          export EXTRA_INCLUDES="-I$PLAY_EMU_ROOT/Source -I$PLAY_EMU_ROOT/Source/app_shared -I$PLAY_EMU_ROOT/Source/ui_ps3 -I/usr/local/ps3dev/ppu/include"
+          # Paths reais do Play! upstream
+          export EXTRA_INCLUDES="-I$PLAY_EMU_ROOT/Source -I$PLAY_EMU_ROOT/Source/app_shared -I$PLAY_EMU_ROOT/Source/ee -I$PLAY_EMU_ROOT/Source/gs -I$PLAY_EMU_ROOT/Source/sound -I/usr/local/ps3dev/ppu/include"
           export PATH="/usr/local/ps3dev/bin:$PATH"
           make clean
           make pkg
