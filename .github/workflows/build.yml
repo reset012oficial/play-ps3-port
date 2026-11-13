@@ -28,18 +28,13 @@ jobs:
         run: |
           sudo ln -sf ${{ github.workspace }}/play-emu /opt/play-emu
 
-      - name: Install PS3 toolchain (pre-compiled from ps3dev releases)
+      - name: Install & Build (single step, no apt-get)
         shell: bash
         run: |
           set -euo pipefail
 
-          # Desabilita needrestart para este processo
-          export NEEDRESTART_MODE=a
-          export DEBIAN_FRONTEND=noninteractive
-
-          # Instala dependências mínimas
-          sudo apt-get update
-          sudo apt-get install -y build-essential wget xz-utils
+          # Runner já tem build-essential, wget, xz-utils
+          # Pula apt-get para evitar needrestart hook
 
           # Baixa toolchain pré-compilado (ps3dev releases)
           cd /tmp
@@ -64,9 +59,6 @@ jobs:
           # Verifica output
           ls -la play_ps3.pkg
           file play_ps3.pkg
-
-          # Força exit 0 (ignora needrestart hook)
-          exit 0
 
       - name: Upload PKG artifact
         uses: actions/upload-artifact@v4
