@@ -28,11 +28,16 @@ jobs:
         run: |
           sudo ln -sf ${{ github.workspace }}/play-emu /opt/play-emu
 
+      - name: Disable needrestart
+        run: |
+          echo "NEEDRESTART_MODE=a" | sudo tee /etc/environment
+          sudo systemctl mask needrestart.service 2>/dev/null || true
+
       - name: Install PS3 toolchain (pre-compiled from ps3dev releases)
         run: |
           # Instala dependências mínimas
           sudo apt-get update
-          sudo apt-get install -y build-essential wget xz-utils || true
+          sudo apt-get install -y build-essential wget xz-utils
 
           # Baixa toolchain pré-compilado (ps3dev releases)
           cd /tmp
