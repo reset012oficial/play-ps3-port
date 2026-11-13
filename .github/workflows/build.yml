@@ -30,13 +30,29 @@ jobs:
 
       - name: Verify Play! checkout / fallback clone
         run: |
+          set -x
           if [ ! -d "${{ github.workspace }}/play-emu/.git" ] || [ -z "$(ls -A ${{ github.workspace }}/play-emu 2>/dev/null)" ]; then
-            echo "Checkout falhou ou diretório vazio — clonando manualmente..."
+            echo "Checkout falhou ou diretório vazio — tentando clones alternativos..."
             rm -rf ${{ github.workspace }}/play-emu
-            git clone --depth 1 https://github.com/jpd002/Play-.git ${{ github.workspace }}/play-emu
+
+            # Tenta URLs conhecidas do Play!
+            for url in \
+              "https://github.com/jpd002/Play-.git" \
+              "https://github.com/jpd002/Play.git" \
+              "https://github.com/play-/play.git" \
+              "https://github.com/play-emu/play.git"; do
+              echo "Tentando: $url"
+              if git clone --depth 1 "$url" ${{ github.workspace }}/play-emu 2>&1; then
+                echo "Sucesso com: $url"
+                break
+              fi
+              rm -rf ${{ github.workspace }}/play-emu
+            done
           else
             echo "Checkout OK: $(ls ${{ github.workspace }}/play-emu | wc -l) itens"
           fi
+          echo "=== Conteúdo final ==="
+          ls -la ${{ github.workspace }}/play-emu
 
       - name: Link Play! source to /opt/play-emu
         run: |
