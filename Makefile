@@ -4,7 +4,7 @@
 .SUFFIXES:
 
 ifeq ($(strip $(PSL1GHT)),)
-PSL1GHT := /opt/psl1ght
+PSL1GHT := /usr/local/ps3dev
 endif
 
 include $(PSL1GHT)/ppu_rules
@@ -39,7 +39,21 @@ all: $(BUILD) $(OUTPUT).self
 
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
-	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
+
+# Build sem recursão - compila direto
+$(OUTPUT).self: $(OUTPUT).elf
+	@$(PSL1GHT)/bin/ppu-strip -o $(OUTPUT).self $(OUTPUT).elf
+
+$(OUTPUT).elf: $(addprefix $(BUILD)/,$(OFILES))
+	@$(CXX) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+$(BUILD)/%.o: %.cpp
+	@mkdir -p $(BUILD)
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD)/%.o: %.c
+	@mkdir -p $(BUILD)
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 pkg: all
 	@mkdir -p pkg/USRDIR
