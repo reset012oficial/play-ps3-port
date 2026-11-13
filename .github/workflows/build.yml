@@ -19,6 +19,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Clone Play! emulator source (for headers)
+        run: |
+          git clone --depth 1 https://github.com/play-emu/play.git /opt/play-emu
+
       - name: Verify PSL1GHT installation
         run: |
           echo "PSL1GHT path: $PSL1GHT"
@@ -30,6 +34,8 @@ jobs:
 
       - name: Build project
         run: |
+          # Adiciona includes do Play! ao Makefile via variável de ambiente
+          export EXTRA_INCLUDES="-I/opt/play-emu/src -I/opt/play-emu/src/ui_ps3"
           make clean
           make pkg
         env:
