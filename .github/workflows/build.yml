@@ -12,9 +12,6 @@ jobs:
     name: Build PS3 PKG
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    container:
-      image: zeldin/ps3dev-docker:latest
-      options: --user root
 
     steps:
       - name: Checkout repository
@@ -24,22 +21,38 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/play-emu/play.git /opt/play-emu
 
-      - name: Verify PSL1GHT installation
+      - name: Install PS3 toolchain (pre-compiled from ps3dev releases)
         run: |
-          echo "PSL1GHT path: $PSL1GHT"
-          ls -la $PSL1GHT
+          # Instala dependências
+          sudo apt-get update
+          sudo apt-get install -y build-essential git python3 python3-pip wget xz-utils libgmp-dev libmpfr-dev libmpc-dev texinfo
+
+          # Baixa toolchain pré-compilado (ps3dev releases)
+          # Versão mais recente conhecida funcional
+          cd /tmp
+          wget -q https://github.com/ps3dev/ps3toolchain/releases/download/2023-07-22/ps3toolchain-2023-07-22-ubuntu-22.04.tar.xz
+          sudo tar -xf ps3toolchain-2023-07-22-ubuntu-22.04.tar.xz -C /
+          export PATH="/usr/local/ps3dev/bin:$PATH"
+
+          # Verifica
           which ppu-g++
+          ppu-g++ --version
+
+      - name: Verify tools
+        run: |
+          export PATH="/usr/local/ps3dev/bin:$PATH"
           which make_self_npdrm
           which sfo.py
           which pkg.py
 
       - name: Build project
         run: |
+          export PATH="/usr/local/ps3dev/bin:$PATH"
           export EXTRA_INCLUDES="-I/opt/play-emu/src -I/opt/play-emu/src/ui_ps3"
           make clean
           make pkg
         env:
-          PSL1GHT: /opt/psl1ght
+          PSL1GHT: /usr/local/ps3dev
 
       - name: Verify PKG output
         run: |
