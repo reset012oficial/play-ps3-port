@@ -60,23 +60,26 @@ jobs:
 
       - name: Explore Play! repo structure
         run: |
-          echo "=== /opt/play-emu contents ==="
-          ls -la /opt/play-emu
+          echo "=== Symlink target ==="
+          readlink -f /opt/play-emu
+          echo ""
+          echo "=== Target contents ==="
+          ls -la "$(readlink -f /opt/play-emu)"
           echo ""
           echo "=== All dirs (depth 3) ==="
-          find /opt/play-emu -maxdepth 3 -type d 2>/dev/null | sort
+          find "$(readlink -f /opt/play-emu)" -maxdepth 3 -type d 2>/dev/null | sort
           echo ""
           echo "=== All .h files ==="
-          find /opt/play-emu -name "*.h" -type f 2>/dev/null | sort
+          find "$(readlink -f /opt/play-emu)" -name "*.h" -type f 2>/dev/null | sort
           echo ""
           echo "=== Looking for AppConfig.h ==="
-          find /opt/play-emu -name "AppConfig.h" -type f 2>/dev/null
+          find "$(readlink -f /opt/play-emu)" -name "AppConfig.h" -type f 2>/dev/null
           echo ""
           echo "=== Looking for PS2VM.h ==="
-          find /opt/play-emu -name "PS2VM.h" -type f 2>/dev/null
+          find "$(readlink -f /opt/play-emu)" -name "PS2VM.h" -type f 2>/dev/null
           echo ""
           echo "=== Looking for PS2VM_Preferences.h ==="
-          find /opt/play-emu -name "PS2VM_Preferences.h" -type f 2>/dev/null
+          find "$(readlink -f /opt/play-emu)" -name "PS2VM_Preferences.h" -type f 2>/dev/null
 
       - name: Find or install Python packaging tools
         run: |
