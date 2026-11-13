@@ -37,14 +37,18 @@ jobs:
           find / -name "sfo.py" -type f 2>/dev/null | head -5
           find / -name "pkg.py" -type f 2>/dev/null | head -5
 
-          # Se não achou, baixa do PSL1GHT source
+          # Se não achou, baixa do PSL1GHT source e procura
           if ! command -v sfo.py &> /dev/null; then
-            echo "Baixando sfo.py e pkg.py do PSL1GHT..."
+            echo "Baixando PSL1GHT source..."
             cd /tmp
             git clone --depth 1 https://github.com/ps3dev/PSL1GHT.git
-            cp PSL1GHT/tools/sfo.py /usr/local/ps3dev/bin/
-            cp PSL1GHT/tools/pkg.py /usr/local/ps3dev/bin/
-            chmod +x /usr/local/ps3dev/bin/sfo.py /usr/local/ps3dev/bin/pkg.py
+            find PSL1GHT -name "sfo.py" -type f 2>/dev/null
+            find PSL1GHT -name "pkg.py" -type f 2>/dev/null
+
+            # Copia se achar
+            find PSL1GHT -name "sfo.py" -exec cp {} /usr/local/ps3dev/bin/ \;
+            find PSL1GHT -name "pkg.py" -exec cp {} /usr/local/ps3dev/bin/ \;
+            chmod +x /usr/local/ps3dev/bin/sfo.py /usr/local/ps3dev/bin/pkg.py 2>/dev/null || true
           fi
 
           # Verifica
