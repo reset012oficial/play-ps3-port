@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     container:
-      image: ghcr.io/ps3dev/ps3dev:latest
+      image: psl1ght/psl1ght:latest
       options: --user root
 
     steps:
