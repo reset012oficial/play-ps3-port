@@ -26,6 +26,17 @@ jobs:
           repository: jpd002/Play-
           path: play-emu
           fetch-depth: 1
+        continue-on-error: true
+
+      - name: Verify Play! checkout / fallback clone
+        run: |
+          if [ ! -d "${{ github.workspace }}/play-emu/.git" ] || [ -z "$(ls -A ${{ github.workspace }}/play-emu 2>/dev/null)" ]; then
+            echo "Checkout falhou ou diretório vazio — clonando manualmente..."
+            rm -rf ${{ github.workspace }}/play-emu
+            git clone --depth 1 https://github.com/jpd002/Play-.git ${{ github.workspace }}/play-emu
+          else
+            echo "Checkout OK: $(ls ${{ github.workspace }}/play-emu | wc -l) itens"
+          fi
 
       - name: Link Play! source to /opt/play-emu
         run: |
