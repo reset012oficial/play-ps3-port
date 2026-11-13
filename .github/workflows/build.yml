@@ -77,7 +77,15 @@ jobs:
 
       - name: Build project
         run: |
-          export EXTRA_INCLUDES="-I/opt/play-emu/src -I/opt/play-emu/src/ui_ps3 -I/usr/local/ps3dev/ppu/include"
+          PLAY_EMU_ROOT="/opt/play-emu"
+
+          if [ ! -f "$PLAY_EMU_ROOT/Source/app_shared/AppConfig.h" ] || [ ! -f "$PLAY_EMU_ROOT/Source/PS2VM.h" ]; then
+            echo "Missing Play! emulator headers in $PLAY_EMU_ROOT"
+            find "$PLAY_EMU_ROOT" \( -path '*/AppConfig.h' -o -path '*/PS2VM.h' -o -path '*/PS2VM_Preferences.h' \) 2>/dev/null || true
+            exit 1
+          fi
+
+          export EXTRA_INCLUDES="-I$PLAY_EMU_ROOT/Source -I$PLAY_EMU_ROOT/Source/app_shared -I$PLAY_EMU_ROOT/Source/ui_ps3 -I/usr/local/ps3dev/ppu/include"
           export PATH="/usr/local/ps3dev/bin:$PATH"
           make clean
           make pkg
