@@ -1,0 +1,48 @@
+name: Build Play! PS3 PKG
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build PS3 PKG
+    runs-on: ubuntu-latest
+    container:
+      image: ps3dev/ps3dev:latest
+      options: --user root
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify PSL1GHT installation
+        run: |
+          echo "PSL1GHT path: $PSL1GHT"
+          ls -la $PSL1GHT
+          which ppu-g++
+          which make_self_npdrm
+          which sfo.py
+          which pkg.py
+
+      - name: Build project
+        run: |
+          make clean
+          make pkg
+        env:
+          PSL1GHT: /opt/psl1ght
+
+      - name: Verify PKG output
+        run: |
+          ls -la play_ps3.pkg
+          file play_ps3.pkg
+
+      - name: Upload PKG artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: play_ps3_pkg
+          path: play_ps3.pkg
+          retention-days: 30
