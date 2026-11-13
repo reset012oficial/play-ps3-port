@@ -11,7 +11,10 @@ jobs:
   build:
     name: Build PS3 PKG
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
+    container:
+      image: ghcr.io/ps3dev/ps3dev:latest
+      options: --user root
 
     steps:
       - name: Checkout repository
@@ -20,18 +23,6 @@ jobs:
       - name: Clone Play! emulator source (for headers)
         run: |
           git clone --depth 1 https://github.com/play-emu/play.git /opt/play-emu
-
-      - name: Install PSL1GHT toolchain
-        run: |
-          # Instala dependências
-          sudo apt-get update
-          sudo apt-get install -y build-essential git python3 python3-pip wget xz-utils
-
-          # Baixa e instala PSL1GHT (ps3dev)
-          cd /tmp
-          git clone --depth 1 https://github.com/ps3dev/ps3toolchain.git
-          cd ps3toolchain
-          sudo ./toolchain.sh
 
       - name: Verify PSL1GHT installation
         run: |
@@ -48,7 +39,7 @@ jobs:
           make clean
           make pkg
         env:
-          PSL1GHT: /usr/local/ps3dev
+          PSL1GHT: /opt/psl1ght
 
       - name: Verify PKG output
         run: |
