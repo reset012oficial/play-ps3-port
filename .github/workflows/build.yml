@@ -28,35 +28,32 @@ jobs:
         run: |
           sudo ln -sf ${{ github.workspace }}/play-emu /opt/play-emu
 
-      - name: Install & Build (single step, no apt-get)
-        shell: bash
+      - name: Install toolchain
         run: |
-          set -euo pipefail
-
-          # Runner já tem build-essential, wget, xz-utils
-          # Pula apt-get para evitar needrestart hook
-
-          # Baixa toolchain pré-compilado (ps3dev releases)
           cd /tmp
           wget -q https://github.com/ps3dev/ps3toolchain/releases/download/2023-07-22/ps3toolchain-2023-07-22-ubuntu-22.04.tar.xz
           sudo tar -xf ps3toolchain-2023-07-22-ubuntu-22.04.tar.xz -C /
-          export PATH="/usr/local/ps3dev/bin:$PATH"
 
-          # Verifica
+      - name: Verify tools
+        run: |
+          export PATH="/usr/local/ps3dev/bin:$PATH"
           which ppu-g++
           ppu-g++ --version
-
-          # Verifica tools
           which make_self_npdrm
           which sfo.py
           which pkg.py
 
-          # Build project
+      - name: Build project
+        run: |
+          export PATH="/usr/local/ps3dev/bin:$PATH"
           export EXTRA_INCLUDES="-I/opt/play-emu/src -I/opt/play-emu/src/ui_ps3"
           make clean
           make pkg
+        env:
+          PSL1GHT: /usr/local/ps3dev
 
-          # Verifica output
+      - name: Verify PKG output
+        run: |
           ls -la play_ps3.pkg
           file play_ps3.pkg
 
