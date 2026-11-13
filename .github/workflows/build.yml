@@ -10,11 +10,8 @@ on:
 jobs:
   build:
     name: Build PS3 PKG
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 60
-    env:
-      DEBIAN_FRONTEND: noninteractive
-      NEEDRESTART_MODE: a
 
     steps:
       - name: Checkout repository
