@@ -28,13 +28,15 @@ jobs:
         run: |
           sudo ln -sf ${{ github.workspace }}/play-emu /opt/play-emu
 
-      - name: Disable needrestart
-        run: |
-          echo "NEEDRESTART_MODE=a" | sudo tee /etc/environment
-          sudo systemctl mask needrestart.service 2>/dev/null || true
-
       - name: Install PS3 toolchain (pre-compiled from ps3dev releases)
+        shell: bash
         run: |
+          set -euo pipefail
+
+          # Desabilita needrestart para este processo
+          export NEEDRESTART_MODE=a
+          export DEBIAN_FRONTEND=noninteractive
+
           # Instala dependências mínimas
           sudo apt-get update
           sudo apt-get install -y build-essential wget xz-utils
@@ -49,26 +51,22 @@ jobs:
           which ppu-g++
           ppu-g++ --version
 
-      - name: Verify tools
-        run: |
-          export PATH="/usr/local/ps3dev/bin:$PATH"
+          # Verifica tools
           which make_self_npdrm
           which sfo.py
           which pkg.py
 
-      - name: Build project
-        run: |
-          export PATH="/usr/local/ps3dev/bin:$PATH"
+          # Build project
           export EXTRA_INCLUDES="-I/opt/play-emu/src -I/opt/play-emu/src/ui_ps3"
           make clean
           make pkg
-        env:
-          PSL1GHT: /usr/local/ps3dev
 
-      - name: Verify PKG output
-        run: |
+          # Verifica output
           ls -la play_ps3.pkg
           file play_ps3.pkg
+
+          # Força exit 0 (ignora needrestart hook)
+          exit 0
 
       - name: Upload PKG artifact
         uses: actions/upload-artifact@v4
