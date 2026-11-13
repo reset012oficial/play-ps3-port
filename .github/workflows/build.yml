@@ -42,9 +42,9 @@ jobs:
             echo "Baixando sfo.py e pkg.py do PSL1GHT..."
             cd /tmp
             git clone --depth 1 https://github.com/ps3dev/PSL1GHT.git
-            sudo cp PSL1GHT/tools/sfo.py /usr/local/ps3dev/bin/
-            sudo cp PSL1GHT/tools/pkg.py /usr/local/ps3dev/bin/
-            sudo chmod +x /usr/local/ps3dev/bin/sfo.py /usr/local/ps3dev/bin/pkg.py
+            cp PSL1GHT/tools/sfo.py /usr/local/ps3dev/bin/
+            cp PSL1GHT/tools/pkg.py /usr/local/ps3dev/bin/
+            chmod +x /usr/local/ps3dev/bin/sfo.py /usr/local/ps3dev/bin/pkg.py
           fi
 
           # Verifica
