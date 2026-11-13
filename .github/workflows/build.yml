@@ -30,9 +30,9 @@ jobs:
 
       - name: Install PS3 toolchain (pre-compiled from ps3dev releases)
         run: |
-          # Instala dependências
+          # Instala dependências mínimas
           sudo apt-get update
-          sudo apt-get install -y build-essential git python3 python3-pip wget xz-utils libgmp-dev libmpfr-dev libmpc-dev texinfo
+          sudo apt-get install -y build-essential wget xz-utils || true
 
           # Baixa toolchain pré-compilado (ps3dev releases)
           cd /tmp
