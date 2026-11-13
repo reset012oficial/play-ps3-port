@@ -29,7 +29,7 @@ jobs:
 
       - name: Link Play! source to /opt/play-emu
         run: |
-          sudo ln -sf ${{ github.workspace }}/play-emu /opt/play-emu
+          ln -sf ${{ github.workspace }}/play-emu /opt/play-emu
 
       - name: Verify PSL1GHT installation
         run: |
