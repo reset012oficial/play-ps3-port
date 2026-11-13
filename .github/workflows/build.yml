@@ -21,8 +21,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: play-emu/play
-          path: /opt/play-emu
+          path: play-emu
           fetch-depth: 1
+
+      - name: Link Play! source to /opt/play-emu
+        run: |
+          sudo ln -sf ${{ github.workspace }}/play-emu /opt/play-emu
 
       - name: Install PS3 toolchain (pre-compiled from ps3dev releases)
         run: |
