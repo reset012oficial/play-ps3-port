@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     name: Build PS3 PKG
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     timeout-minutes: 60
 
     steps:
