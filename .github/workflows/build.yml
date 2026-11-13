@@ -31,6 +31,12 @@ jobs:
         run: |
           ln -sf ${{ github.workspace }}/play-emu /opt/play-emu
 
+      - name: Find Play! include paths
+        run: |
+          find /opt/play-emu -name "AppConfig.h" -type f 2>/dev/null
+          find /opt/play-emu -name "PS2VM.h" -type f 2>/dev/null
+          find /opt/play-emu -name "GSH_Null.h" -type f 2>/dev/null
+
       - name: Find or install Python packaging tools
         run: |
           # Procura no container
