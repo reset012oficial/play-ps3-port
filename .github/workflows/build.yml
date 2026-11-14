@@ -28,6 +28,14 @@ jobs:
           fetch-depth: 1
         continue-on-error: true
 
+      - name: Checkout Play! Framework (for filesystem_def.h)
+        uses: actions/checkout@v4
+        with:
+          repository: jpd002/Play--Framework
+          path: play-framework
+          fetch-depth: 1
+        continue-on-error: true
+
       - name: Verify Play! checkout / fallback clone
         run: |
           set -x
@@ -57,6 +65,7 @@ jobs:
       - name: Link Play! source to /opt/play-emu
         run: |
           ln -sf ${{ github.workspace }}/play-emu /opt/play-emu
+          ln -sf ${{ github.workspace }}/play-framework /opt/play-framework
 
       - name: Find missing headers
         run: |
@@ -102,6 +111,7 @@ jobs:
       - name: Build project
         run: |
           PLAY_EMU_ROOT="/opt/play-emu"
+          PLAY_FRAMEWORK_ROOT="/opt/play-framework"
 
           if [ ! -f "$PLAY_EMU_ROOT/Source/app_shared/AppConfig.h" ] || [ ! -f "$PLAY_EMU_ROOT/Source/PS2VM.h" ]; then
             echo "Missing Play! emulator headers in $PLAY_EMU_ROOT"
@@ -114,6 +124,10 @@ jobs:
           for d in $(find "$PLAY_EMU_ROOT/Source" -type d 2>/dev/null); do
             EXTRA_INC="$EXTRA_INC -I$d"
           done
+          # Adiciona Play! Framework include path (para filesystem_def.h)
+          if [ -d "$PLAY_FRAMEWORK_ROOT/include" ]; then
+            EXTRA_INC="$EXTRA_INC -I$PLAY_FRAMEWORK_ROOT/include"
+          fi
           EXTRA_INC="$EXTRA_INC -I/usr/local/ps3dev/ppu/include"
           export EXTRA_INCLUDES="$EXTRA_INC"
 
