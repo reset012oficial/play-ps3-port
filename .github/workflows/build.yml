@@ -109,8 +109,14 @@ jobs:
             exit 1
           fi
 
-          # Paths reais do Play! upstream
-          export EXTRA_INCLUDES="-I$PLAY_EMU_ROOT/Source -I$PLAY_EMU_ROOT/Source/app_shared -I$PLAY_EMU_ROOT/Source/ee -I$PLAY_EMU_ROOT/Source/gs -I$PLAY_EMU_ROOT/Source/sound -I/usr/local/ps3dev/ppu/include"
+          # Adiciona TODOS os subdiretórios de Source ao include path
+          EXTRA_INC=""
+          for d in $(find "$PLAY_EMU_ROOT/Source" -type d 2>/dev/null); do
+            EXTRA_INC="$EXTRA_INC -I$d"
+          done
+          EXTRA_INC="$EXTRA_INC -I/usr/local/ps3dev/ppu/include"
+          export EXTRA_INCLUDES="$EXTRA_INC"
+
           export PATH="/usr/local/ps3dev/bin:$PATH"
           make clean
           make pkg
