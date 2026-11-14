@@ -66,6 +66,9 @@ jobs:
         run: |
           ln -sf ${{ github.workspace }}/play-emu /opt/play-emu
           ln -sf ${{ github.workspace }}/play-framework /opt/play-framework
+          echo "=== Play! Framework contents ==="
+          ls -la /opt/play-framework
+          find /opt/play-framework -name "filesystem_def.h" -type f 2>/dev/null
 
       - name: Find missing headers
         run: |
