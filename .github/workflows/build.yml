@@ -71,10 +71,10 @@ jobs:
             # Copia o .so compilado (pode estar em build/lib.*/)
             find build -name "pkgcrypt*.so" -exec cp {} . \; 2>/dev/null || true
 
-            # Instala módulos no site-packages do Python para que sejam importáveis
+            # Instala pkgcrypt (C extension) no site-packages
             python3 -m pip install --no-deps . 2>/dev/null || python3 setup.py install
 
-            # Também copia scripts para /usr/local/ps3dev/bin para compatibilidade
+            # Copia todos os módulos Python (.py) para /usr/local/ps3dev/bin/
             cp *.py /usr/local/ps3dev/bin/
             cp pkgcrypt*.so /usr/local/ps3dev/bin/ 2>/dev/null || true
             chmod +x /usr/local/ps3dev/bin/*.py 2>/dev/null || true
@@ -82,10 +82,10 @@ jobs:
             cd /tmp
           fi
 
-          # Verifica
+          # Verifica - adiciona /usr/local/ps3dev/bin ao PYTHONPATH
           which sfo.py
           which pkg.py
-          python3 -c "import Struct; import pkgcrypt; print('Python modules OK')" 2>&1
+          PYTHONPATH="/usr/local/ps3dev/bin:$PYTHONPATH" python3 -c "import Struct; import pkgcrypt; print('Python modules OK')" 2>&1
 
       - name: Verify PSL1GHT installation
         run: |
