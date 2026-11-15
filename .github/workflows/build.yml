@@ -55,7 +55,7 @@ jobs:
           find / -name "sfo.py" -type f 2>/dev/null | head -5
           find / -name "pkg.py" -type f 2>/dev/null | head -5
 
-          # Se não achou, baixa do PSL1GHT source e procura
+          # Se não achou, baixa do PSL1GHT source e compila/instala
           if ! command -v sfo.py &> /dev/null; then
             echo "Baixando PSL1GHT source..."
             cd /tmp
@@ -63,15 +63,23 @@ jobs:
             find PSL1GHT -name "sfo.py" -type f 2>/dev/null
             find PSL1GHT -name "pkg.py" -type f 2>/dev/null
 
-            # Copia scripts Python e todas as dependências (Struct.py, pkgcrypt.py, etc.)
-            find PSL1GHT/tools/ps3py -name "*.py" -exec cp {} /usr/local/ps3dev/bin/ \;
+            # Compila pkgcrypt (C extension)
+            echo "Compilando pkgcrypt..."
+            cd PSL1GHT/tools/ps3py
+            python3 setup.py build_ext --inplace
+
+            # Copia todos os módulos Python e a extensão compilada
+            cp *.py /usr/local/ps3dev/bin/
+            cp pkgcrypt*.so /usr/local/ps3dev/bin/ 2>/dev/null || true
             chmod +x /usr/local/ps3dev/bin/*.py 2>/dev/null || true
+
+            cd /tmp
           fi
 
           # Verifica
           which sfo.py
           which pkg.py
-          python3 -c "import Struct; import pkgcrypt" 2>&1
+          python3 -c "import Struct; import pkgcrypt; print('Python modules OK')" 2>&1
 
       - name: Verify PSL1GHT installation
         run: |
