@@ -12,7 +12,7 @@ include $(PSL1GHT)/ppu_rules
 TARGET		:= play_ps3
 BUILD		:= build
 SOURCES		:= . Source/ui_ps3
-INCLUDES	:= . Source Source/ui_ps3
+INCLUDES	:= . Source Source/ui_ps3 Source/ui_ps3/signal
 
 TITLE		:= Play! PS2 Emulator v2.3.1
 APPID		:= PLAYPS300
