@@ -86,34 +86,34 @@ public:
     static bool IsIsoFile(const char* name)
     {
         if (!name) return false;
-        size_t len = std::strlen(name);
+        size_t len = strlen(name);
         if (len < 4) return false;
         const char* ext = name + len - 4;
-        return (std::strcmp(ext, ".iso") == 0 || std::strcmp(ext, ".ISO") == 0);
+        return (strcmp(ext, ".iso") == 0 || strcmp(ext, ".ISO") == 0);
     }
     static FILE* OpenIsoFile(const std::string& path, uint64_t* outSize)
     {
         if (path.empty() || outSize == nullptr) return nullptr;
         *outSize = 0;
-        FILE* file = std::fopen(path.c_str(), "rb");
+        FILE* file = fopen(path.c_str(), "rb");
         if (!file) return nullptr;
-        if (std::fseek(file, 0, SEEK_END) != 0) { std::fclose(file); return nullptr; }
-        long fileSize = std::ftell(file);
-        if (fileSize < 0 || std::fseek(file, 0, SEEK_SET) != 0) { std::fclose(file); return nullptr; }
+        if (fseek(file, 0, SEEK_END) != 0) { fclose(file); return nullptr; }
+        long fileSize = ftell(file);
+        if (fileSize < 0 || fseek(file, 0, SEEK_SET) != 0) { fclose(file); return nullptr; }
         *outSize = static_cast<uint64_t>(fileSize);
-        if (*outSize < ISO_SECTOR_SIZE) { std::fclose(file); *outSize = 0; return nullptr; }
-        std::setvbuf(file, nullptr, _IOFBF, 128 * 1024);
+        if (*outSize < ISO_SECTOR_SIZE) { fclose(file); *outSize = 0; return nullptr; }
+        setvbuf(file, nullptr, _IOFBF, 128 * 1024);
         return file;
     }
     static bool ReadIso(FILE* file, uint64_t offset, void* buffer, size_t size, uint64_t isoSize)
     {
         if (!file || !buffer || size == 0) return false;
         if (offset > isoSize || static_cast<uint64_t>(size) > isoSize - offset) return false;
-        if (std::fseek(file, static_cast<long>(offset), SEEK_SET) != 0) return false;
+        if (fseek(file, static_cast<long>(offset), SEEK_SET) != 0) return false;
         size_t totalRead = 0;
         while (totalRead < size)
         {
-            size_t amount = std::fread(static_cast<unsigned char*>(buffer) + totalRead, 1, size - totalRead, file);
+            size_t amount = fread(static_cast<unsigned char*>(buffer) + totalRead, 1, size - totalRead, file);
             if (amount == 0) return false;
             totalRead += amount;
         }
@@ -124,7 +124,7 @@ public:
         if (sector > UINT64_MAX / ISO_SECTOR_SIZE) return false;
         return ReadIso(file, sector * ISO_SECTOR_SIZE, buffer, ISO_SECTOR_SIZE, isoSize);
     }
-    static void CloseIsoFile(FILE* file) { if (file) std::fclose(file); }
+    static void CloseIsoFile(FILE* file) { if (file) fclose(file); }
     static void EnsureDirectoriesExist()
     {
         mkdir("/dev_hdd0/PS2ISO", 0777);
@@ -185,7 +185,7 @@ public:
     static CPadHandler::FactoryFunction GetFactoryFunction() { return []() { return new CPH_Ps3(); }; }
     void Update(uint8_t* data) override
     {
-        std::memset(&m_currentPad, 0, sizeof(m_currentPad));
+        memset(&m_currentPad, 0, sizeof(m_currentPad));
         bool exitRequested = false;
         padInfo padinfo;
         ioPadGetInfo(&padinfo);
