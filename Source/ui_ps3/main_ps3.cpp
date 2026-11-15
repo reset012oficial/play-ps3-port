@@ -49,7 +49,7 @@ public:
         char buffer[1024];
         va_list args;
         va_start(args, format);
-        std::vsnprintf(buffer, sizeof(buffer), format, args);
+        vsnprintf(buffer, sizeof(buffer), format, args);
         va_end(args);
         std::printf("%s", buffer);
         FILE* logFile = std::fopen("/dev_hdd0/play_ps3_log.txt", "a");
