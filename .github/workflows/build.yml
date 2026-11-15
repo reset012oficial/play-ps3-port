@@ -63,12 +63,18 @@ jobs:
             find PSL1GHT -name "sfo.py" -type f 2>/dev/null
             find PSL1GHT -name "pkg.py" -type f 2>/dev/null
 
-            # Compila pkgcrypt (C extension)
-            echo "Compilando pkgcrypt..."
+            # Compila pkgcrypt (C extension) e instala tudo
+            echo "Compilando e instalando pkgcrypt..."
             cd PSL1GHT/tools/ps3py
             python3 setup.py build_ext --inplace
 
-            # Copia todos os módulos Python e a extensão compilada
+            # Copia o .so compilado (pode estar em build/lib.*/)
+            find build -name "pkgcrypt*.so" -exec cp {} . \; 2>/dev/null || true
+
+            # Instala módulos no site-packages do Python para que sejam importáveis
+            python3 -m pip install --no-deps . 2>/dev/null || python3 setup.py install
+
+            # Também copia scripts para /usr/local/ps3dev/bin para compatibilidade
             cp *.py /usr/local/ps3dev/bin/
             cp pkgcrypt*.so /usr/local/ps3dev/bin/ 2>/dev/null || true
             chmod +x /usr/local/ps3dev/bin/*.py 2>/dev/null || true
