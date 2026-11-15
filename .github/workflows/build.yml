@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     name: Build PS3 PKG
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 60
     container:
       image: hldtux/ps3dev:latest
