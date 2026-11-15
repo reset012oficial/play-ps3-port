@@ -97,13 +97,14 @@ jobs:
             fi
           done
 
-          # Adiciona TODOS os subdiretórios de Source ao include path
-          EXTRA_INC=""
+          # IMPORTANT: Local stubs FIRST so they override Play! headers
+          EXTRA_INC="-I$(pwd)/Source/ui_ps3"
+          # Then add Play! Source subdirectories
           for d in $(find "$PLAY_EMU_ROOT/Source" -type d 2>/dev/null); do
             EXTRA_INC="$EXTRA_INC -I$d"
           done
-          # Also add the Play! root and our local Source/ui_ps3 for stubs
-          EXTRA_INC="$EXTRA_INC -I$PLAY_EMU_ROOT -I$(pwd)/Source/ui_ps3"
+          # Also add the Play! root
+          EXTRA_INC="$EXTRA_INC -I$PLAY_EMU_ROOT"
           # Adiciona ppu include path
           EXTRA_INC="$EXTRA_INC -I/usr/local/ps3dev/ppu/include"
           export EXTRA_INCLUDES="$EXTRA_INC"
