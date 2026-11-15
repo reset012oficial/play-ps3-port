@@ -1,4 +1,5 @@
 #define _FILE_OFFSET_BITS 64
+#define _GNU_SOURCE
 
 #include <cstdio>
 #include <cstdlib>
@@ -48,7 +49,7 @@ public:
         char buffer[1024];
         va_list args;
         va_start(args, format);
-        vsnprintf(buffer, sizeof(buffer), format, args);
+        std::vsnprintf(buffer, sizeof(buffer), format, args);
         va_end(args);
         std::printf("%s", buffer);
         FILE* logFile = std::fopen("/dev_hdd0/play_ps3_log.txt", "a");
@@ -97,9 +98,9 @@ public:
         *outSize = 0;
         FILE* file = std::fopen(path.c_str(), "rb");
         if (!file) return nullptr;
-        if (::fseeko(file, 0, SEEK_END) != 0) { std::fclose(file); return nullptr; }
-        off_t fileSize = ::ftello(file);
-        if (fileSize < 0 || ::fseeko(file, 0, SEEK_SET) != 0) { std::fclose(file); return nullptr; }
+        if (std::fseek(file, 0, SEEK_END) != 0) { std::fclose(file); return nullptr; }
+        long fileSize = std::ftell(file);
+        if (fileSize < 0 || std::fseek(file, 0, SEEK_SET) != 0) { std::fclose(file); return nullptr; }
         *outSize = static_cast<uint64_t>(fileSize);
         if (*outSize < ISO_SECTOR_SIZE) { std::fclose(file); *outSize = 0; return nullptr; }
         std::setvbuf(file, nullptr, _IOFBF, 128 * 1024);
@@ -109,7 +110,7 @@ public:
     {
         if (!file || !buffer || size == 0) return false;
         if (offset > isoSize || static_cast<uint64_t>(size) > isoSize - offset) return false;
-        if (::fseeko(file, static_cast<off_t>(offset), SEEK_SET) != 0) return false;
+        if (std::fseek(file, static_cast<long>(offset), SEEK_SET) != 0) return false;
         size_t totalRead = 0;
         while (totalRead < size)
         {
@@ -183,7 +184,7 @@ class CPH_Ps3 : public CPH_Generic
 {
 public:
     static CPadHandler::FactoryFunction GetFactoryFunction() { return []() { return new CPH_Ps3(); }; }
-    void Update(uint8* data) override
+    void Update(uint8_t* data) override
     {
         std::memset(&m_currentPad, 0, sizeof(m_currentPad));
         bool exitRequested = false;
@@ -193,7 +194,7 @@ public:
         for (int i = 0; i < 7; i++) { if (padinfo.status[i]) { activePort = i; break; } }
         if (activePort != -1 && ioPadGetData(activePort, &m_currentPad) == 0 && m_currentPad.len > 0)
         {
-            using B = PS2::CControllerInfo;
+            using B = CControllerInfo;
             SetButtonState(B::DPAD_UP, m_currentPad.BTN_UP != 0);
             SetButtonState(B::DPAD_DOWN, m_currentPad.BTN_DOWN != 0);
             SetButtonState(B::DPAD_LEFT, m_currentPad.BTN_LEFT != 0);

@@ -40,6 +40,7 @@ public:
 
     virtual void CDROM0_SyncPath()
     {
+        m_cdrom0 = true;
     }
 
     virtual void Reset()
@@ -74,6 +75,8 @@ public:
     {
         return nullptr;
     }
+
+    bool m_cdrom0 = false;
 
     EE* m_ee = nullptr;
 

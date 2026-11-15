@@ -2,13 +2,16 @@
 #define SH_NULL_H
 
 #include "SoundHandler.h"
+#include <functional>
 
 class CSH_Null : public CSoundHandler
 {
 public:
-    static CSoundHandler* GetFactoryFunction()
+    using FactoryFunction = std::function<CSoundHandler*()>;
+
+    static FactoryFunction GetFactoryFunction()
     {
-        return new CSH_Null();
+        return []() { return new CSH_Null(); };
     }
 
     CSH_Null() = default;

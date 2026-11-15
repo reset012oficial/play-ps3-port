@@ -16,9 +16,9 @@ public:
 class CGSH_Null : public CGSHandler
 {
 public:
-    static CGSHandler* GetFactoryFunction()
+    static FactoryFunction GetFactoryFunction()
     {
-        return new CGSH_Null();
+        return []() { return new CGSH_Null(); };
     }
 
     CGSH_Null() = default;
