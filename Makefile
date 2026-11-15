@@ -35,14 +35,12 @@ export INCLUDE	:= $(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) -I$(CURDIR)/$(BU
 
 .PHONY: all pkg clean
 
-all: $(BUILD) $(OUTPUT).self
+all: $(BUILD) $(OUTPUT).elf
 
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
 
 # Build sem recursão - compila direto
-$(OUTPUT).self: $(OUTPUT).elf
-	@$(PSL1GHT)/bin/ppu-strip -o $(OUTPUT).self $(OUTPUT).elf
 
 $(OUTPUT).elf: $(addprefix $(BUILD)/,$(OFILES))
 	@$(CXX) $(LDFLAGS) -o $@ $^ $(LIBS)
@@ -57,7 +55,7 @@ $(BUILD)/%.o: %.c
 
 pkg: all
 	@mkdir -p pkg/USRDIR
-	@cp $(OUTPUT).self pkg/USRDIR/EBOOT.BIN
+	@cp $(OUTPUT).elf pkg/USRDIR/EBOOT.BIN
 	@make_self_npdrm $(OUTPUT).elf pkg/USRDIR/EBOOT.BIN $(CONTENTID)
 	@sfo.py --title "$(TITLE)" --appid "$(APPID)" -f $(PSL1GHT)/bin/sfo.xml pkg/PARAM.SFO
 	@pkg.py --contentid $(CONTENTID) pkg/ $(TARGET).pkg
