@@ -44,19 +44,20 @@ static bool g_systemExitRequested = false;
 class Logger
 {
 public:
-    static void Log(const char* format, ...)
+    template<typename... Args>
+    static void Log(const char* format, Args... args)
     {
         char buffer[1024];
-        va_list args;
-        va_start(args, format);
-        vsnprintf(buffer, sizeof(buffer), format, args);
-        va_end(args);
-        std::printf("%s", buffer);
-        FILE* logFile = std::fopen("/dev_hdd0/play_ps3_log.txt", "a");
-        if (logFile)
+        int len = std::snprintf(buffer, sizeof(buffer), format, args...);
+        if (len > 0)
         {
-            std::fputs(buffer, logFile);
-            std::fclose(logFile);
+            std::printf("%s", buffer);
+            FILE* logFile = std::fopen("/dev_hdd0/play_ps3_log.txt", "a");
+            if (logFile)
+            {
+                std::fwrite(buffer, 1, static_cast<size_t>(len), logFile);
+                std::fclose(logFile);
+            }
         }
     }
     static void Clear()
