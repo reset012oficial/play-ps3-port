@@ -1,7 +1,6 @@
 #define _FILE_OFFSET_BITS 64
 
 #include <stdio.h>
-#include <cstdio>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
@@ -47,7 +46,7 @@ public:
     static void Log(const char* format, Args... args)
     {
         char buffer[1024];
-        int len = snprintf(buffer, sizeof(buffer), format, args...);
+        int len = sprintf(buffer, format, args...);
         if (len > 0)
         {
             printf("%s", buffer);
