@@ -29,17 +29,25 @@ jobs:
 
       - name: Link Play! source to /opt/play-emu
         run: |
-          ln -sf ${{ github.workspace }}/play-emu /opt/play-emu
+          # Use GITHUB_WORKSPACE env var (set correctly inside container) instead of github.workspace context
+          ln -sf "$GITHUB_WORKSPACE/play-emu" /opt/play-emu
           echo "=== Play! emulator contents ==="
           ls -la /opt/play-emu
+          echo "GITHUB_WORKSPACE = $GITHUB_WORKSPACE"
 
-      - name: Find missing headers
+      - name: Explore Play! emulator source structure
         run: |
-          echo "=== Procurando Config.h ==="
-          find /opt/play-emu -name "Config.h" -type f 2>/dev/null
+          echo "=== Play! emulator root ==="
+          ls -la /opt/play-emu
           echo ""
-          echo "=== Procurando SH_Null.h ==="
-          find /opt/play-emu -name "SH_Null.h" -type f 2>/dev/null
+          echo "=== Play! Source directory structure ==="
+          find /opt/play-emu/Source -type f -name "*.h" 2>/dev/null | head -100
+          echo ""
+          echo "=== Looking for specific headers ==="
+          for h in AppConfig.h PS2VM.h PS2VM_Preferences.h GSH_Null.h PH_Generic.h ControllerInfo.h PS2OS.h Types.h; do
+            echo "--- $h ---"
+            find /opt/play-emu -name "$h" -type f 2>/dev/null
+          done
 
       - name: Find or install Python packaging tools
         run: |
@@ -78,20 +86,30 @@ jobs:
         run: |
           PLAY_EMU_ROOT="/opt/play-emu"
 
-          if [ ! -f "$PLAY_EMU_ROOT/Source/app_shared/AppConfig.h" ] || [ ! -f "$PLAY_EMU_ROOT/Source/PS2VM.h" ]; then
-            echo "Missing Play! emulator headers in $PLAY_EMU_ROOT"
-            find "$PLAY_EMU_ROOT" \( -path '*/AppConfig.h' -o -path '*/PS2VM.h' -o -path '*/PS2VM_Preferences.h' \) 2>/dev/null || true
-            exit 1
-          fi
+          # Check for critical Play! headers (Config.h and SH_Null.h are local stubs)
+          echo "=== Checking for Play! headers ==="
+          for h in AppConfig.h PS2VM.h PS2VM_Preferences.h PH_Generic.h ControllerInfo.h; do
+            found=$(find "$PLAY_EMU_ROOT" -name "$h" -type f 2>/dev/null | head -1)
+            if [ -n "$found" ]; then
+              echo "FOUND: $h at $found"
+            else
+              echo "MISSING: $h"
+            fi
+          done
 
           # Adiciona TODOS os subdiretórios de Source ao include path
           EXTRA_INC=""
           for d in $(find "$PLAY_EMU_ROOT/Source" -type d 2>/dev/null); do
             EXTRA_INC="$EXTRA_INC -I$d"
           done
+          # Also add the Play! root and our local Source/ui_ps3 for stubs
+          EXTRA_INC="$EXTRA_INC -I$PLAY_EMU_ROOT -I$(pwd)/Source/ui_ps3"
           # Adiciona ppu include path
           EXTRA_INC="$EXTRA_INC -I/usr/local/ps3dev/ppu/include"
           export EXTRA_INCLUDES="$EXTRA_INC"
+
+          echo "=== EXTRA_INCLUDES ==="
+          echo "$EXTRA_INCLUDES"
 
           export PATH="/usr/local/ps3dev/bin:$PATH"
           make clean
