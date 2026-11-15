@@ -1,13 +1,11 @@
 #define _FILE_OFFSET_BITS 64
-#define _GNU_SOURCE
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <cstdint>
-#include <climits>
-#include <cerrno>
-#include <cstdarg>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
+#include <limits.h>
+#include <errno.h>
 #include <string>
 #include <vector>
 #include <memory>
@@ -48,25 +46,25 @@ public:
     static void Log(const char* format, Args... args)
     {
         char buffer[1024];
-        int len = std::snprintf(buffer, sizeof(buffer), format, args...);
+        int len = snprintf(buffer, sizeof(buffer), format, args...);
         if (len > 0)
         {
-            std::printf("%s", buffer);
-            FILE* logFile = std::fopen("/dev_hdd0/play_ps3_log.txt", "a");
+            printf("%s", buffer);
+            FILE* logFile = fopen("/dev_hdd0/play_ps3_log.txt", "a");
             if (logFile)
             {
-                std::fwrite(buffer, 1, static_cast<size_t>(len), logFile);
-                std::fclose(logFile);
+                fwrite(buffer, 1, static_cast<size_t>(len), logFile);
+                fclose(logFile);
             }
         }
     }
     static void Clear()
     {
-        FILE* logFile = std::fopen("/dev_hdd0/play_ps3_log.txt", "w");
+        FILE* logFile = fopen("/dev_hdd0/play_ps3_log.txt", "w");
         if (logFile)
         {
-            std::fputs("=== INICIO DO LOG PLAY! PS3 v2.3.1 ===\n", logFile);
-            std::fclose(logFile);
+            fputs("=== INICIO DO LOG PLAY! PS3 v2.3.1 ===\n", logFile);
+            fclose(logFile);
         }
     }
 };
